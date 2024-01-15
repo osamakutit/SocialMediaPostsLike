@@ -34,12 +34,12 @@ class CategoryController extends Controller
 {
     $validatedData = $request->validate([
         'name' => 'required|string',
-        'categoyry_id' => 'required|integer|exists:categouries,id',
+        'category_id' => 'required|integer|exists:categories,id',
     ]);
 
     $category = Category::create([
         'name' => $validatedData['name'],
-        'categoyry_id' => $validatedData['categoyry_id'],
+        'category_id' => $validatedData['category_id'],
     ]);
 
     return response()->json(['message' => 'Category created successfully']);
@@ -47,7 +47,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $category = Post::find($id);
+        $category = Category::find($id);
     
         if (!$category) {
             return response()->json(['error' => 'Category not found'], 404);
@@ -55,7 +55,7 @@ class CategoryController extends Controller
     
         $validatedData = $request->validate([
             'name' => 'string',
-            'categoyry_id' => 'integer|exists:categouries,id',
+            'category_id' => 'integer|exists:categories,id',
         ]);
     
         $category->update($validatedData);

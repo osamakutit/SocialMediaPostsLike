@@ -16,19 +16,12 @@ class PostResource extends JsonResource
     {
         return [
             'category' => $this->category->name,
-            'author' => $this->user->name,
             'title' => $this->title,
+            'author' => new UserResource($this->user),
             'text' => $this->text,
             'image' => $this->image,
+            'likes' => $this->likes->where('liked',1)->count(),
+            'comment' => $this->likes->where('comment',!null)->count(),
         ];
     }
-
-    // public function formatSingleItem()
-    // {
-    //     return [
-    //         'title' => $this->title,
-    //         'image' => $this->image,
-    //         'author' => $this->user->name,
-    //     ];
-    // }
 }

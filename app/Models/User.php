@@ -43,13 +43,9 @@ class User extends Authenticatable implements JWTSubject
             return $this->role === 1;
        }
 
-    public function isAuthor(){
-        return $this->role === 2;
-   }
-
    public function isClient(){
-    return $this->role === 3;
-}
+    return $this->role === 2;
+    }
       
     protected $hidden = [
         'password',

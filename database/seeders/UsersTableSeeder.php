@@ -18,20 +18,20 @@ class UsersTableSeeder extends Seeder
             [
                 'name' => 'Osama Admin',
                 'email' => 'osama@example.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make('123456'),
                 'role' => '1',
             ],
             [
-                'name' => 'Osama Author',
+                'name' => 'Osama Client 1',
                 'email' => 'osama2@example.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make('123456'),
                 'role' => '2',
             ],
             [
-                'name' => 'Osama Client',
+                'name' => 'Osama Client 2',
                 'email' => 'osama3@example.com',
-                'password' => Hash::make('123'),
-                'role' => '3',
+                'password' => Hash::make('123456'),
+                'role' => '2',
             ],
         ];
         

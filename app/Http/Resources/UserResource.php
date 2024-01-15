@@ -21,9 +21,6 @@ class UserResource extends JsonResource
                 $role = 'admin';
                 break;
             case 2:
-                $role = 'author';
-                break;
-            case 3:
                 $role = 'client';
                 break;
         }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Post;
@@ -13,9 +13,28 @@ class PostController extends Controller
 {
     public function list()
     {
-        $posts = Post::all();
+        //if (Auth::user()->isAdmin()) {
+            $posts = Post::all();
+        //}
+        // else{
+        //     $userId = Auth::id();
+        //     $posts = Post::where('author', $userId)->get();
+        // }
         return PostResource::collection($posts);
     }
+
+    public function mine()
+    {
+        if (Auth::user()->isAdmin()) {
+            $posts = Post::all();
+        }
+         else{
+             $userId = Auth::id();
+             $posts = Post::where('author', $userId)->get();
+         }
+        return PostResource::collection($posts);
+    }
+
 
     public function show($id)
     {
@@ -30,21 +49,34 @@ class PostController extends Controller
 
     public function store(Request $request)
 {
-    $validatedData = $request->validate([
+
+    $rules = [
         'title' => 'required|string',
-        'author' => 'required|integer|exists:users,id',
-        'categoyry_id' => 'required|integer|exists:categouries,id',
+        'category_id' => 'required|integer|exists:categories,id',
         'text' => 'required|string',
         'image' => 'required|string',
-    ]);
+    ];
+    
+    if (Auth::user()->isAdmin()) {
+        $rules['author'] = 'required|integer|exists:users,id';
+    }
+    
+    $validatedData = $request->validate($rules);
 
-    $post = Post::create([
+    $userId = Auth::id();
+    $postData = [
         'title' => $validatedData['title'],
-        'author' => $validatedData['author'],
-        'categoyry_id' => $validatedData['categoyry_id'],
+        'category_id' => $validatedData['category_id'],
         'text' => $validatedData['text'],
         'image' => $validatedData['image'],
-    ]);
+    ];
+
+    if (Auth::user()->isAdmin()) {
+        $postData['author'] = $validatedData['author'];
+    } else {
+        $postData['author'] = $userId;
+    }
+    $post = Post::create($postData);
 
     return response()->json(['message' => 'Post created successfully']);
 }
@@ -57,30 +89,61 @@ class PostController extends Controller
             return response()->json(['error' => 'Post not found'], 404);
         }
     
-        $validatedData = $request->validate([
-            'title' => 'string',
-            'author' => 'integer|exists:users,id',
-            'categoyry_id' => 'integer|exists:categouries,id',
-            'text' => 'string',
-            'image' => 'string',
-        ]);
-    
-        $post->update($validatedData);
-    
-        return response()->json(['message' => 'Post updated successfully']);
-    }
+        $rules = [
+        'title' => 'required|string',
+        'category_id' => 'required|integer|exists:categories,id',
+        'text' => 'required|string',
+        'image' => 'required|string',
+        ];
 
-    public function delete($id)
-    {
-        $post = Post::find($id);
-    
-        if (!$post) {
-            return response()->json(['error' => 'Post not found'], 404);
+        if (Auth::user()->isAdmin()) {
+            $rules['author'] = 'required|integer|exists:users,id';
         }
+        $validatedData = $request->validate($rules);
+
+        $userId = Auth::id();
+
+        $authorPost = Post::where('id', $id)
+        ->pluck('author')
+        ->first();
+
+        $authorAcc = Post::where('author', $userId)
+        ->pluck('author')
+        ->first();
+
+        if (Auth::user()->isAdmin()) {
+            $post->update($validatedData);
+            return response()->json(['message' => 'Post updated successfully']);
+        }
+        else{
+            if ($authorPost === $authorAcc){
+                $post->update($validatedData);
+                return response()->json(['message' => 'Post updated successfully']);
+            }
+            else{
+                return response()->json(['error' => 'Post not authorized'], 403);
+            }
+        }
+    }
     
-        $post->delete();
+
+    public function delete($id = null)
+    {
+        if (Auth::user()->isAdmin()) {
+            $post = Post::find($id);
+        }
+        else{
+            $userId = Auth::id();
+            $post = Post::where('author', $userId)->where('id',$id)->first();
+        }
+        
+         if (!$post) {
+             return response()->json(['error' => 'Post not found'], 404);
+         }
     
-        return response()->json(['message' => 'Post deleted successfully']);
+         $post->delete();
+    
+         return response()->json(['message' => 'Post deleted successfully']);
     }
 
     
