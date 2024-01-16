@@ -10,7 +10,9 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "laravel/ui": "^4.3",
         "predis/predis": "^2.2",
+        "spatie/laravel-activitylog": "^4.7",
         "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {

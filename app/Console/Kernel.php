@@ -10,6 +10,10 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
+    protected $commands = [
+        commands\GetInfo::class,
+        commands\ClearLog::class
+    ];
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
